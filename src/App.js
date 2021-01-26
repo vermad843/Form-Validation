@@ -1,14 +1,94 @@
+import React,{useState} from 'react';
 import './App.css';
 import Header from './Header';
 
+const emailRegex = RegExp(
+  /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+);
+
+const formValid = formErrors => {
+  let valid = true;
+  
+  Object.values(formErrors).forEach(val => {
+    val.length > 0 && (valid = false);
+  });
+  return valid;
+}
+
 function App() {
+
+   const [state, setState] = useState({
+      firstName : null,
+      lastName : null,
+      email : null,
+      password : null,
+   });
+
+   const [error, setErrors] = useState({
+       firstName : '',
+       lastName : '',
+       email : '',
+       password : ''
+   })
+
+  const handleSubmit = (e) => {
+      e.preventDefault();
+      
+      if(formValid(error)) {
+        console.log(`
+          --SUBMITTING--
+          FIRST NAME : ${state.firstName}
+        `)
+      }else {
+        console.error("FORM INVALID");
+      }
+  }
+
+ const handleChange = (e) => {
+   e.preventDefault();
+   const {name , value} = e.target;
+   let formErrors = {...error};
+
+   console.log("Name: ", name);
+   console.log("value: ", value);
+
+   switch(name) {
+     case 'firstName' : 
+       formErrors.firstName = 
+          value.length < 3 && value.length > 0 
+            ? 'min 3 char required'  
+            : '';
+          break;
+     case 'lastName' : 
+       formErrors.lastName = 
+          value.length < 3 && value.length > 0 
+            ? 'min 3 char required'  
+            : '';
+          break;
+    case 'email' : 
+       formErrors.email = 
+          emailRegex.test(value) && value.length > 0 
+            ? ''  
+            : 'invalid email address';
+          break;
+    case 'password' : 
+       formErrors.password = 
+          value.length < 3 && value.length > 0 
+            ? 'min 3 char required'  
+            : '';
+          break;
+        default:
+          break;
+   }
+  };
+
   return (
     <>
      <Header/>
     <div className="wrapper">
        <div className = "form-wrapper">
            <h1>Create Account</h1>
-           <form  noValidate>
+           <form onSubmit = {handleSubmit} noValidate>
             <div className="firstName">
               <label htmlFor="firstName">First Name</label>
               <input
@@ -17,7 +97,7 @@ function App() {
                 type="text"
                 name="firstName"
                 noValidate
-                // onChange={this.handleChange}
+                onChange={handleChange}
               />
             </div>
             <div className="lastName">
@@ -28,7 +108,7 @@ function App() {
                 type="text"
                 name="lastName"
                 noValidate
-                // onChange={this.handleChange}
+                onChange={handleChange}
               />
             </div>
             <div className="email">
@@ -39,7 +119,7 @@ function App() {
                 type="email"
                 name="email"
                 noValidate
-                // onChange={this.handleChange}
+                onChange={handleChange}
               />
             </div>
             <div className="password">
@@ -50,7 +130,7 @@ function App() {
                 type="password"
                 name="password"
                 noValidate
-                // onChange={this.handleChange}
+                onChange={handleChange}
               />
             </div>
             <div className="createAccount">
